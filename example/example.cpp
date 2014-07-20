@@ -1,6 +1,5 @@
 #include "../TinyJS.h"
-#include <stdlib.h>
 int main() {
-	int a = CTinyJS::eval("./example/example.js");
+	int a = CTinyJS::runJS("var a = 4; exports = a;");
 	printf("result: %d", a);
 }

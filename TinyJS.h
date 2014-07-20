@@ -286,7 +286,7 @@ public:
     CTinyJS();
     ~CTinyJS();
 
-    static int eval(const char *filename);
+    static int runJS(const char *filename);
 
     void execute(const std::string &code);
     /** Evaluate the given code and return a link to a javascript object,
