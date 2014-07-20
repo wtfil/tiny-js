@@ -1,0 +1,4 @@
+*.o
+Script
+*.dSYM*
+run_tests

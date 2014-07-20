@@ -121,6 +121,7 @@
 
 #include "TinyJS.h"
 #include <assert.h>
+#include <sys/stat.h>
 
 #define ASSERT(X) assert(X)
 /* Frees the given link IF it isn't owned by anything else */
@@ -1302,6 +1303,40 @@ CTinyJS::~CTinyJS() {
 #if DEBUG_MEMORY
     show_allocated();
 #endif
+}
+
+int CTinyJS::eval(const char *filename) {
+  	struct stat results;
+  	if (stat(filename, &results) != 0) {
+  		printf("ERROR: no such file");
+     	throw "Not such file";
+  	}
+  	int size = results.st_size;
+  	FILE *file = fopen( filename, "rb" );
+  	if( !file ) {
+  		printf("ERROR: file is empty");
+     	throw "File is empty";
+  	}
+  	char *buffer = new char[size+1];
+  	long actualRead = fread(buffer,1,size,file);
+  	buffer[actualRead]=0;
+  	buffer[size]=0;
+  	fclose(file);
+
+  	CTinyJS s;
+  	//registerFunctions(&s);
+  	//registerMathFunctions(&s);
+  	s.root->addChild("result", new CScriptVar("0",SCRIPTVAR_INTEGER));
+  	try {
+    	s.execute(buffer);
+  	} catch (CScriptException *e) {
+    	printf("ERROR: %s\n", e->text.c_str());
+  	}
+
+  	bool pass = s.root->getParameter("result")->getBool();
+
+  	delete[] buffer;
+  	return s.root->getParameter("exports")->getInt();
 }
 
 void CTinyJS::trace() {
